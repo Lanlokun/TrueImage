@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Upload and Verify Image</h1>
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+<!-- Image Upload Form -->
+<form method="POST" enctype="multipart/form-data">
+    <h2>Upload Image</h2>
+    <input type="file" name="image" accept="image/*">
+    <button type="submit">Upload and Sign</button>
+</form>
+
+<!-- Image Verification Form -->
+<form method="POST" enctype="multipart/form-data">
+    <h2>Verify Image</h2>
+    <input type="file" name="verify_image" accept="image/*">
+    <button type="submit">Verify Image</button>
+</form>
+
+<!-- Image Verification Results -->
+{% if verification_result is not none %}
+    <h3>Verification Result</h3>
+    {% if verification_result is true %}
+        <p>✅ Image signature is valid!</p>
+    {% else %}
+        <p>❌ {{ verification_result }}</p>
+    {% endif %}
+{% endif %}

@@ -1,0 +1,19 @@
+2025-03-08 22:25:33,268 - WARNING -  * Debugger is active!
+2025-03-08 22:25:33,268 - INFO -  * Debugger PIN: 794-138-437
+2025-03-08 22:25:41,311 - WARNING - User ID 2120246036 already exists!
+2025-03-08 22:25:41,313 - INFO - 127.0.0.1 - - [08/Mar/2025 22:25:41] "[32mPOST / HTTP/1.1[0m" 302 -
+2025-03-08 22:25:41,329 - INFO - 127.0.0.1 - - [08/Mar/2025 22:25:41] "GET / HTTP/1.1" 200 -
+2025-03-08 22:25:41,370 - INFO - 127.0.0.1 - - [08/Mar/2025 22:25:41] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-03-08 22:25:43,254 - INFO - 127.0.0.1 - - [08/Mar/2025 22:25:43] "GET / HTTP/1.1" 200 -
+2025-03-08 22:25:43,280 - INFO - 127.0.0.1 - - [08/Mar/2025 22:25:43] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-03-08 22:25:52,650 - WARNING - User ID 2120246036 already exists!
+2025-03-08 22:25:52,650 - INFO - 127.0.0.1 - - [08/Mar/2025 22:25:52] "[32mPOST / HTTP/1.1[0m" 302 -
+2025-03-08 22:25:52,654 - INFO - 127.0.0.1 - - [08/Mar/2025 22:25:52] "GET / HTTP/1.1" 200 -
+2025-03-08 22:25:52,673 - INFO - 127.0.0.1 - - [08/Mar/2025 22:25:52] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-03-08 22:37:53,544 - INFO -  * Detected change in '/home/lanlokun/Documents/Nankai University/2nd Semester/Software Engineering/image-encryption/server.py', reloading
+2025-03-08 22:37:53,844 - WARNING -  * Debugger is active!
+2025-03-08 22:37:53,845 - INFO -  * Debugger PIN: 794-138-437
+2025-03-08 22:38:02,911 - INFO -  * Detected change in '/home/lanlokun/Documents/Nankai University/2nd Semester/Software Engineering/image-encryption/server.py', reloading
+2025-03-08 22:38:03,220 - WARNING -  * Debugger is active!
+2025-03-08 22:38:03,220 - INFO -  * Debugger PIN: 794-138-437
+2025-03-08 22:40:41,149 - INFO -  * Detected change in '/home/lanlokun/Documents/Nankai University/2nd Semester/Software Engineering/image-encryption/server.py', reloading
