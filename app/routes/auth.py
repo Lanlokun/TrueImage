@@ -31,7 +31,9 @@ def generate_keys():
     return private_pem, public_pem
 
 
-
+@auth_bp.route('/')
+def landing():
+    return render_template('index.html')
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():

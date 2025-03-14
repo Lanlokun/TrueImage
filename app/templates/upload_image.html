@@ -1,39 +1,53 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Upload and Verify Image</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow p-4">
+                <h1 class="text-center">Upload & Verify Image</h1>
 
-<!-- Flash messages -->
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul>
-        {% for message in messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
-{% endwith %}
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <div class="alert alert-warning">
+                            {% for message in messages %}
+                                <p class="mb-0">{{ message }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
 
-<!-- Image Upload Form -->
-<form method="POST" enctype="multipart/form-data">
-    <h2>Upload Image</h2>
-    <input type="file" name="image" accept="image/*">
-    <button type="submit">Upload and Sign</button>
-</form>
+                <!-- Image Upload Form -->
+                <form method="POST" enctype="multipart/form-data" class="mt-3">
+                    <h2 class="text-primary">📤 Upload Image</h2>
+                    <input type="file" name="image" accept="image/*" class="form-control mb-3" required>
+                    <button type="submit" class="btn btn-primary w-100">Upload & Sign</button>
+                </form>
 
-<!-- Image Verification Form -->
-<form method="POST" enctype="multipart/form-data">
-    <h2>Verify Image</h2>
-    <input type="file" name="verify_image" accept="image/*">
-    <button type="submit">Verify Image</button>
-</form>
+                <!-- Divider -->
+                <hr class="my-4">
 
-<!-- Image Verification Results -->
-{% if verification_result is not none %}
-    <h3>Verification Result</h3>
-    {% if verification_result is true %}
-        <p>✅ Image signature is valid!</p>
-    {% else %}
-        <p>❌ {{ verification_result }}</p>
-    {% endif %}
-{% endif %}
+                <!-- Image Verification Form -->
+                <form method="POST" enctype="multipart/form-data" action="{{ url_for('images.verify_image_route') }}">
+                    <h2 class="text-success">🔍 Verify Image</h2>
+                    <input type="file" name="verify_image" accept="image/*" class="form-control mb-3" required>
+                    <button type="submit" class="btn btn-success w-100">Verify Image</button>
+                </form>
+
+                <!-- Verification Results -->
+                {% if verification_result is not none %}
+                    <div class="mt-4 text-center">
+                        <h3>Verification Result</h3>
+                        {% if verification_result is true %}
+                            <p class="alert alert-success">✅ Image signature is valid!</p>
+                        {% else %}
+                            <p class="alert alert-danger">❌ {{ verification_result }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

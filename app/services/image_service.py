@@ -80,13 +80,13 @@ def verify_image(user_id, image_path):
 
         if not metadata:
             logging.error(f"No metadata found for user_id={user_id}, filename={os.path.basename(image_path)}")
-            return "Metadata not found for this image."
+            return False  # Return False when metadata is not found
 
         # Retrieve the user from the database
         user = User.query.get(user_id)
         if not user:
             logging.error(f"User not found for user_id={user_id}")
-            return "User not found."
+            return False  # Return False when user is not found
 
         # Load the public key from the database
         public_key = serialization.load_pem_public_key(
@@ -104,8 +104,8 @@ def verify_image(user_id, image_path):
             hashes.SHA256()
         )
         logging.debug("Signature is valid. Image is authentic.")
-        return True
-    
+        return True  # Return True when the signature is valid
+
     except Exception as e:
         logging.error(f"Error verifying image: {e}")
-        return f"Signature verification failed: {e}"
+        return False  # Return False when an error occurs

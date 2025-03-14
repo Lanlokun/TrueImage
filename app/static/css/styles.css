@@ -1,26 +1,55 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
+html, body {
+    height: 100%;
     margin: 0;
     padding: 0;
+    display: flex;
+    flex-direction: column;
 }
 
+.content {
+    flex: 1; /* Pushes the footer to the bottom */
+}
+/* Header & Navigation */
 header {
     background-color: #007bff;
     color: #fff;
     padding: 10px 20px;
 }
 
-header nav a {
+nav {
+    display: flex;
+    justify-content: space-between;  /* Ensures Home is left, Logout is right */
+    align-items: center;
+    padding: 10px 20px;
+}
+
+/* Aligning Home (Left) & Logout (Right) */
+.nav-left {
+    flex-grow: 1; /* Pushes Home to the left */
+}
+
+.nav-right {
+    display: flex;
+    gap: 15px; /* Adds space between items */
+}
+
+/* Navigation Links */
+nav a {
     color: #fff;
     text-decoration: none;
-    margin-right: 15px;
+    padding: 10px;
 }
 
-header nav a:hover {
-    text-decoration: underline;
+nav a:hover {
+    text-decoration: underline; /* Ensures only underline appears */
 }
 
+/* Logout Button */
+.logout-btn {
+    font-weight: bold;
+}
+
+/* Forms Styling */
 .login-container, .register-container {
     max-width: 400px;
     margin: 50px auto;
@@ -34,7 +63,20 @@ header nav a:hover {
     margin-bottom: 20px;
     text-align: center;
 }
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 
+.upload-form, .verify-form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Fields */
 .form-group {
     margin-bottom: 15px;
 }
@@ -50,14 +92,65 @@ header nav a:hover {
     border-radius: 4px;
 }
 
+input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.btn-upload {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-upload:hover {
+    background-color: #0056b3;
+}
+
+
+
+.btn-verify {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-verify:hover {
+    background-color: #218838;
+}
+
+.verification-result {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+
+
+/* Buttons */
 .btn-login, .btn-register {
     width: 100%;
     padding: 10px;
-    background-color: #007bff;
     color: #fff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+}
+
+.btn-login {
+    background-color: #007bff;
 }
 
 .btn-login:hover {
@@ -72,6 +165,7 @@ header nav a:hover {
     background-color: #218838;
 }
 
+/* Links in Login/Register */
 .register-link, .login-link {
     text-align: center;
     margin-top: 15px;
@@ -86,6 +180,7 @@ header nav a:hover {
     text-decoration: underline;
 }
 
+/* Flash Messages */
 .flash-messages {
     margin-bottom: 20px;
 }
@@ -105,4 +200,19 @@ header nav a:hover {
     background-color: #d4edda;
     color: #155724;
     border: 1px solid #c3e6cb;
+}
+
+
+.footer {
+    background-color: #333;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+}
+.footer a {
+    color: #007bff;
+    text-decoration: none;
+}
+.footer a:hover {
+    text-decoration: underline;
 }
