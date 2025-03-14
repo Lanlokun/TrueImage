@@ -6,6 +6,8 @@ class User(db.Model, UserMixin):  # Inherit from UserMixin
     id = db.Column(db.Integer, primary_key=True)
     phone_number = db.Column(db.String, unique=True, nullable=False)
     password_hash = db.Column(db.String, nullable=False)
+    national_id = db.Column(db.String(20), unique=True, nullable=False)
+
     private_key = db.Column(db.LargeBinary, nullable=False)
     public_key = db.Column(db.LargeBinary, nullable=False)
 

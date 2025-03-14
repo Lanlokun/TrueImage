@@ -152,6 +152,18 @@ button {
 .btn-login {
     background-color: #007bff;
 }
+/* Adjust the input field icons */
+.input-group-text {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    color: #007bff;
+}
+
+/* Style the login button with icon */
+.btn-login i {
+    margin-right: 10px;
+}
+
 
 .btn-login:hover {
     background-color: #0056b3;

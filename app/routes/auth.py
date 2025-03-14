@@ -39,8 +39,17 @@ def landing():
 def register():
     if request.method == 'POST':
         phone_number = request.form['phone']
+        
+        # Check if the phone number is already registered
         if User.query.filter_by(phone_number=phone_number).first():
             flash('Phone number already registered.', 'error')
+            return redirect(url_for('auth.register'))
+        
+        national_id = request.form['national_id']  # Get National ID
+        
+        # Check if the National ID is already registered (optional, based on your requirements)
+        if User.query.filter_by(national_id=national_id).first():
+            flash('National ID already registered.', 'error')
             return redirect(url_for('auth.register'))
         
         password = request.form['password']
@@ -51,8 +60,9 @@ def register():
         # Create user
         user = User(
             phone_number=phone_number,
+            national_id=national_id,  # Save the National ID
             password_hash=generate_password_hash(password),
-            private_key=private_pem,  # Store private key
+            private_key=private_pem,   # Store private key
             public_key=public_pem     # Store public key
         )
         db.session.add(user)
@@ -62,6 +72,7 @@ def register():
         return redirect(url_for('auth.login'))
     
     return render_template('register.html')
+
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():

@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Register - Flask App{% endblock %}
+{% block title %}Register - True Image{% endblock %}
 
 {% block content %}
 <div class="register-container">
-    <h2>Register</h2>
+    <h2><i class="fas fa-user-plus"></i> Register</h2> <!-- Add Register Icon -->
 
     <!-- Flash messages -->
     <div class="flash-messages">
@@ -21,20 +21,33 @@
 
     <!-- Registration form -->
     <form method="POST" action="{{ url_for('auth.register') }}">
+        
+        <!-- National ID field -->
         <div class="form-group">
-            <label for="phone">Phone Number</label>
+            <label for="national_id"><i class="fas fa-id-card"></i> National ID</label> <!-- National ID Icon -->
+            <input type="text" id="national_id" name="national_id" required>
+        </div>
+
+        <!-- Phone Number field -->
+        <div class="form-group">
+            <label for="phone"><i class="fas fa-phone"></i> Phone Number</label> <!-- Phone Icon -->
             <input type="text" id="phone" name="phone" required>
         </div>
+
+        <!-- Password field -->
         <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password"><i class="fas fa-lock"></i> Password</label> <!-- Lock Icon -->
             <input type="password" id="password" name="password" required>
         </div>
-        <button type="submit" class="btn-register">Register</button>
+
+        <button type="submit" class="btn-register">
+            <i class="fas fa-user-plus"></i> Register <!-- Register Icon -->
+        </button>
     </form>
 
     <!-- Login link -->
     <div class="login-link">
-        Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>
+        Already have an account? <a href="{{ url_for('auth.login') }}"><i class="fas fa-sign-in-alt"></i> Login here</a> <!-- Login Icon -->
     </div>
 </div>
 {% endblock %}
