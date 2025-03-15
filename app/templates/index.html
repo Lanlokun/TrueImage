@@ -1,199 +1,647 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Encryption App</title>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>True Image - Image Authentication</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- AOS Library for Scroll Animations -->
-    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <style>
-        /* Global Styles */
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-        }
+  <!-- Favicons -->
+  <link href="images/apple-touch-icon.png" rel="apple-touch-icon">
 
-        /* Hero Section */
-        .hero-section {
-            background: url('https://via.placeholder.com/1600x800/007bff/ffffff?text=Secure+Image+Encryption') no-repeat center center/cover;
-            color: rgb(19, 0, 0);
-            padding: 120px 0;
-            text-align: center;
-            position: relative;
-        }
-        .hero-section::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 123, 255, 0.5);
-        }
-        .hero-section h1 {
-            font-size: 4rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            z-index: 1;
-            animation: slideIn 1s ease-out;
-        }
-        .hero-section p {
-            font-size: 1.25rem;
-            margin-bottom: 40px;
-            z-index: 1;
-            animation: fadeIn 1.5s ease-out;
-        }
-        .btn-primary {
-            background-color: #172432;
-            border-color: #007bff;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            border-radius: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease;
-            z-index: 1;
-        }
-        .btn-primary:hover {
-            background-color: #020508;
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-        }
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Nunito:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
-        /* Features Section */
-        .features-section {
-            padding: 80px 0;
-            background-color: #fff;
-        }
-        .features-section h2 {
-            font-size: 2.8rem;
-            text-align: center;
-            margin-bottom: 50px;
-            color: #333;
-            animation: fadeInUp 1.5s ease-out;
-        }
-        .feature-card {
-            position: relative;
-            text-align: center;
-            padding: 30px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, #007bff, #00bfff);
-            color: white;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-        }
-        .feature-card img {
-            width: 60px;
-            margin-bottom: 20px;
-        }
-        .feature-card h3 {
-            font-size: 1.75rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        .feature-card p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/aos/aos.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
+  
 
-        /* Footer */
-        .footer {
-            background-color: #333;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-        .footer a {
-            color: #007bff;
-            text-decoration: none;
-            transition: text-decoration 0.3s ease;
-        }
-        .footer a:hover {
-            text-decoration: underline;
-        }
+  <!-- Main CSS File -->
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
 
-        /* Animations */
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        @keyframes slideIn {
-            0% { transform: translateY(30px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes fadeInUp {
-            0% { opacity: 0; transform: translateY(30px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+  <!-- =======================================================
+  * Template Name: iLanding
+  * Template URL: https://bootstrapmade.com/ilanding-bootstrap-landing-page-template/
+  * Updated: Nov 12 2024 with Bootstrap v5.3.3
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
 </head>
-<body>
 
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="container">
-        <h1 data-aos="fade-up">Welcome to True Image</h1>
-        <p data-aos="fade-up" data-aos-delay="300">Securely sign and verify your images with ease.</p>
-        <a href="{{ url_for('auth.login') }}" class="btn btn-primary" data-aos="fade-up" data-aos-delay="600" style="position: relative; z-index: 2;">Login</a>
-        <a href="{{ url_for('auth.register') }}" class="btn btn-primary" data-aos="fade-up" data-aos-delay="800" style="position: relative; z-index: 2;">Register</a>
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="images/logo.png" alt=""> -->
+        <h1 class="sitename">TrueImage</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="#hero" class="active">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted" href="{{ url_for('auth.login') }}">Get Started</a>
+
     </div>
-</section>
+  </header>
 
+  <main class="main">
 
+    <!-- Hero Section -->
+    <section id="hero" class="hero section">
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+      
+          <div class="row align-items-center">
+            <div class="col-lg-6">
+              <div class="hero-content" data-aos="fade-up" data-aos-delay="200">
+                <div class="company-badge mb-4">
+                  <i class="bi bi-shield-lock-fill me-2"></i>
+                  Ensuring Image Integrity with Cryptography
+                </div>
+      
+                <h1 class="mb-4">
+                  Trust Your Images <br>
+                  With Secure Authentication <br>
+                  <span class="accent-text">Blockchain-powered Cryptography</span>
+                </h1>
+      
+                <p class="mb-4 mb-md-5">
+                  TRUE IMAGE ensures the authenticity of your images using cutting-edge cryptography. Safeguard your digital assets with our revolutionary image authentication software that guarantees security and trust.
+                </p>
+      
+                <div class="hero-buttons">
+                  <a href="{{ url_for('auth.register')}}" class="btn btn-primary me-0 me-sm-2 mx-1">Register</a>
+                  <a href="{{ url_for('auth.login')}}" class="btn btn-primary me-2 me-sm-2 mx-1">
+                    Login
+                  </a>
+                </div>
+              </div>
+            </div>
+      
+            <div class="col-lg-6">
+              <div class="hero-image" data-aos="zoom-out" data-aos-delay="300">
+                <img src="{{ url_for('static', filename='images/hero.jpg') }}" alt="Image Authentication" class="img-fluid">
+              
+                <div class="customers-badge">
+                  <div class="customer-avatars">
+                    <img src="{{ url_for('static', filename='images/avatar-1.webp') }}" alt="Customer 1" class="avatar">
+                    <img src="{{ url_for('static', filename='images/avatar-2.webp') }}" alt="Customer 2" class="avatar">
+                    <img src="{{ url_for('static', filename='images/avatar-3.webp') }}" alt="Customer 3" class="avatar">
+                    <img src="{{ url_for('static', filename='images/avatar-4.webp') }}" alt="Customer 4" class="avatar">
+                    <img src="{{ url_for('static', filename='images/avatar-5.webp') }}" alt="Customer 5" class="avatar">
+                    <span class="avatar more">12+</span>
+                  </div>
+                  <p class="mb-0 mt-2">12,000+ verified images protected with TRUE IMAGE authentication</p>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+      
+          <div class="row stats-row gy-4 mt-5" data-aos="fade-up" data-aos-delay="500">
+            <div class="col-lg-3 col-md-6">
+              <div class="stat-item">
+                <div class="stat-icon">
+                  <i class="bi bi-shield-lock"></i>
+                </div>
+                <div class="stat-content">
+                  <h4>Enhanced Security</h4>
+                  <p class="mb-0">Blockchain-based cryptography</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <div class="stat-item">
+                <div class="stat-icon">
+                  <i class="bi bi-image"></i>
+                </div>
+                <div class="stat-content">
+                  <h4>Verified Images</h4>
+                  <p class="mb-0">Ensure authenticity with every image</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <div class="stat-item">
+                <div class="stat-icon">
+                  <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                  <h4>Accuracy Guaranteed</h4>
+                  <p class="mb-0">Detect tampering and alterations</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <div class="stat-item">
+                <div class="stat-icon">
+                  <i class="bi bi-award"></i>
+                </div>
+                <div class="stat-content">
+                  <h4>Industry Recognition</h4>
+                  <p class="mb-0">Award-winning image authentication solution</p>
+                </div>
+              </div>
+            </div>
+          </div>
+      
+        </div>
+      
+      </section><!-- /Hero Section -->
+      
+    <!-- About Section -->
+    <section id="about" class="about section">
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+      
+          <div class="row gy-4 align-items-center justify-content-between">
+      
+            <div class="col-xl-5" data-aos="fade-up" data-aos-delay="200">
+              <span class="about-meta">MORE ABOUT US</span>
+              <h2 class="about-title">Empowering Innovation for a Smarter Future</h2>
+              <p class="about-description">We believe in leveraging technology and data to drive impactful changes across industries. Our team is passionate about creating solutions that not only improve the present but also pave the way for a brighter, more innovative future.</p>
+      
+              <div class="row feature-list-wrapper">
+                <div class="col-md-6">
+                  <ul class="feature-list">
+                    <li><i class="bi bi-check-circle-fill"></i> Cutting-edge AI technologies</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Transformative solutions for businesses</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Commitment to sustainable growth</li>
+                  </ul>
+                </div>
+                <div class="col-md-6">
+                  <ul class="feature-list">
+                    <li><i class="bi bi-check-circle-fill"></i> Expert team with industry experience</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Data-driven insights for better decisions</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Empowering the future of innovation</li>
+                  </ul>
+                </div>
+              </div>
+      
+              <div class="info-wrapper">
+                <div class="row gy-4">
+                  <div class="col-lg-5">
+                    <div class="profile d-flex align-items-center gap-3">
+                      <img src="{{ url_for('static', filename='images/ceo.jpg') }}" alt="CEO Profile" class="profile-image">
+                      <div>
+                        <h4 class="profile-name">Malik Kolawole Lanlokun</h4>
+                        <p class="profile-position">CEO &amp; Founder</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-7">
+                    <div class="contact-info d-flex align-items-center gap-2">
+                      <i class="bi bi-telephone-fill"></i>
+                      <div>
+                        <p class="contact-label">Call us anytime</p>
+                        <p class="contact-number">+86 183-0224-7031</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+      
+            <div class="col-xl-6" data-aos="fade-up" data-aos-delay="300">
+              <div class="image-wrapper">
+                <div class="images position-relative" data-aos="zoom-out" data-aos-delay="400">
+                  <img src="{{ url_for('static', filename='images/about-5.webp') }}" alt="Business Meeting" class="img-fluid main-image rounded-4">
+                  <img src="{{ url_for('static', filename='images/about-2.webp') }}" alt="Team Discussion" class="img-fluid small-image rounded-4">
+               </div>
+                <div class="experience-badge floating">
+                  <h3>15+ <span>Years</span></h3>
+                  <p>Of experience in business service</p>
+                </div>
+              </div>
+            </div>
+          </div>
+      
+        </div>
+      
+      </section><!-- /About Section -->
+      
     <!-- Features Section -->
-    <section class="features-section">
+    <section id="features" class="features section">
+
+        <!-- Section Title -->
+        <div class="container section-title" data-aos="fade-up">
+          <h2>Features</h2>
+          <p>Authenticating your images with cryptography to ensure their authenticity and integrity.</p>
+        </div><!-- End Section Title -->
+      
         <div class="container">
-            <h2 data-aos="fade-up">Features</h2>
-            <div class="row">
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                    <div class="feature-card">
-                        <h3>Image Signing</h3>
-                        <p>Sign your images with a unique digital signature to ensure authenticity.</p>
-                    </div>
+      
+          <div class="d-flex justify-content-center">
+      
+            <ul class="nav nav-tabs" data-aos="fade-up" data-aos-delay="100">
+      
+              <li class="nav-item">
+                <a class="nav-link active show" data-bs-toggle="tab" data-bs-target="#features-tab-1">
+                  <h4>Image Authentication</h4>
+                </a>
+              </li><!-- End tab nav item -->
+      
+              <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#features-tab-2">
+                  <h4>Cryptographic Security</h4>
+                </a><!-- End tab nav item -->
+      
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#features-tab-3">
+                  <h4>Verification Process</h4>
+                </a>
+              </li><!-- End tab nav item -->
+      
+            </ul>
+      
+          </div>
+      
+          <div class="tab-content" data-aos="fade-up" data-aos-delay="200">
+      
+            <div class="tab-pane fade active show" id="features-tab-1">
+              <div class="row">
+                <div class="col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0 d-flex flex-column justify-content-center">
+                  <h3>Image Authentication with Cryptography</h3>
+                  <p class="fst-italic">
+                    Ensure the integrity of your images with cryptographic signatures that provide proof of authenticity and prevent tampering.
+                  </p>
+                  <ul>
+                    <li><i class="bi bi-check2-all"></i> <span>Secure your images with cryptographic signing techniques.</span></li>
+                    <li><i class="bi bi-check2-all"></i> <span>Verifiable digital signatures for added trust.</span></li>
+                    <li><i class="bi bi-check2-all"></i> <span>Protect the originality of images against alterations and fraud.</span></li>
+                  </ul>
                 </div>
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
-                    <div class="feature-card">
-                        <h3>Image Verification</h3>
-                        <p>Verify the authenticity of signed images using their digital signatures.</p>
-                    </div>
+                <div class="col-lg-6 order-1 order-lg-2 text-center">
+                  <img src="{{ url_for('static', filename='images/features-illustration-1.webp') }}" alt="Image Authentication Mockup" class="img-fluid">
                 </div>
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="600">
-                    <div class="feature-card">
-                        <h3>Secure Storage</h3>
-                        <p>Store your signed images and signatures securely in the database.</p>
+              </div>
+            </div><!-- End tab content item -->
+      
+            <div class="tab-pane fade" id="features-tab-2">
+              <div class="row">
+                <div class="col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0 d-flex flex-column justify-content-center">
+                  <h3>Advanced Cryptographic Security</h3>
+                  <p class="fst-italic">
+                    Ensure that every image is safely encrypted, utilizing state-of-the-art cryptographic algorithms to guard against data breaches.
+                  </p>
+                  <ul>
+                    <li><i class="bi bi-check2-all"></i> <span>Powerful encryption techniques to secure image data.</span></li>
+                    <li><i class="bi bi-check2-all"></i> <span>Full control over image integrity and distribution.</span></li>
+                    <li><i class="bi bi-check2-all"></i> <span>Privacy protection through secure image signing.</span></li>
+                  </ul>
+                </div>
+                <div class="col-lg-6 order-1 order-lg-2 text-center">
+                  <img src="{{ url_for('static', filename='images/features-illustration-2.webp') }}" alt="Cryptographic Security Mockup" class="img-fluid">
+                </div>
+              </div>
+            </div><!-- End tab content item -->
+      
+            <div class="tab-pane fade" id="features-tab-3">
+              <div class="row">
+                <div class="col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0 d-flex flex-column justify-content-center">
+                  <h3>Effortless Image Verification</h3>
+                  <ul>
+                    <li><i class="bi bi-check2-all"></i> <span>Instantly verify the authenticity of your images.</span></li>
+                    <li><i class="bi bi-check2-all"></i> <span>Real-time authenticity checks with user-friendly interfaces.</span></li>
+                    <li><i class="bi bi-check2-all"></i> <span>Effortless validation against cryptographic signatures.</span></li>
+                  </ul>
+                  <p class="fst-italic">
+                    Swiftly confirm the origin and authenticity of images with easy-to-use verification tools.
+                  </p>
+                </div>
+                <div class="col-lg-6 order-1 order-lg-2 text-center">
+                  <img src="{{ url_for('static', filename='images/features-illustration-3.webp') }}" alt="Image Verification Mockup" class="img-fluid">
+                </div>
+              </div>
+            </div><!-- End tab content item -->
+      
+          </div>
+      
+        </div>
+      
+      </section><!-- /Features Section -->
+      
+      <!-- Features Cards Section -->
+      <section id="features-cards" class="features-cards section">
+      
+        <div class="container">
+      
+          <div class="row gy-4">
+      
+            <div class="col-xl-3 col-md-6" data-aos="zoom-in" data-aos-delay="100">
+              <div class="feature-box orange">
+                <i class="bi bi-award"></i>
+                <h4>Advanced Cryptography</h4>
+                <p>Employ cutting-edge cryptographic techniques to sign and secure your images, ensuring authenticity and preventing unauthorized changes.</p>
+              </div>
+            </div><!-- End Feature Box-->
+      
+            <div class="col-xl-3 col-md-6" data-aos="zoom-in" data-aos-delay="200">
+              <div class="feature-box blue">
+                <i class="bi bi-patch-check"></i>
+                <h4>Seamless Authentication</h4>
+                <p>Authenticate your images easily with a seamless integration process, guaranteeing real-time image verification with just a few clicks.</p>
+              </div>
+            </div><!-- End Feature Box-->
+      
+            <div class="col-xl-3 col-md-6" data-aos="zoom-in" data-aos-delay="300">
+              <div class="feature-box green">
+                <i class="bi bi-sunrise"></i>
+                <h4>Image Integrity Assurance</h4>
+                <p>Protect your images from tampering with cryptographic signatures, ensuring that the images remain in their original state.</p>
+              </div>
+            </div><!-- End Feature Box-->
+      
+            <div class="col-xl-3 col-md-6" data-aos="zoom-in" data-aos-delay="400">
+              <div class="feature-box red">
+                <i class="bi bi-shield-check"></i>
+                <h4>Secure Distribution</h4>
+                <p>Distribute your images securely across platforms, knowing that each image is authenticated and its authenticity is verifiable by all parties.</p>
+              </div>
+            </div><!-- End Feature Box-->
+      
+          </div>
+      
+        </div>
+      
+      </section><!-- /Features Cards Section -->
+      
+      <!-- Features 2 Section -->
+      <section id="features-2" class="features-2 section">
+          <div class="container" data-aos="fade-up" data-aos-delay="100">
+            <div class="row align-items-center">
+      
+              <!-- First Column -->
+              <div class="col-lg-4">
+                <!-- Feature Item 1: True Image -->
+                <div class="feature-item text-end mb-5" data-aos="fade-right" data-aos-delay="200">
+                  <div class="d-flex align-items-center justify-content-end gap-4">
+                    <div class="feature-content">
+                      <h3>True Image Technology</h3>
+                      <p>Authenticate images in real-time using advanced cryptographic techniques to guarantee their authenticity.</p>
                     </div>
+                    <div class="feature-icon flex-shrink-0">
+                      <i class="bi bi-image"></i>
+                    </div>
+                  </div>
+                </div><!-- End .feature-item -->
+      
+                <!-- Feature Item 2: Seamless Integration -->
+                <div class="feature-item text-end mb-5" data-aos="fade-right" data-aos-delay="300">
+                  <div class="d-flex align-items-center justify-content-end gap-4">
+                    <div class="feature-content">
+                      <h3>Seamless Integration</h3>
+                      <p>Integrate image authentication into your existing systems with ease. No complicated setups required—just plug and play.</p>
+                    </div>
+                    <div class="feature-icon flex-shrink-0">
+                      <i class="bi bi-plug"></i>
+                    </div>
+                  </div>
+                </div><!-- End .feature-item -->
+      
+                <!-- Feature Item 3: Cross-Device Support -->
+                <div class="feature-item text-end" data-aos="fade-right" data-aos-delay="400">
+                  <div class="d-flex align-items-center justify-content-end gap-4">
+                    <div class="feature-content">
+                      <h3>Works On Any Device</h3>
+                      <p>Whether you're using a smartphone, tablet, or desktop, True Image guarantees consistent performance across all devices.</p>
+                    </div>
+                    <div class="feature-icon flex-shrink-0">
+                      <i class="bi bi-device-phone"></i>
+                    </div>
+                  </div>
+                </div><!-- End .feature-item -->
+      
+              </div><!-- End First Column -->
+      
+              <!-- Second Column -->
+              <div class="col-lg-8">
+                <div class="feature-image" data-aos="fade-left" data-aos-delay="200">
+                  <img src="{{ url_for('static', filename='images/features-illustration-3.webp') }}" alt="Image Authentication Feature" class="img-fluid">
+                </div>
+              </div><!-- End Second Column -->
+      
+            </div>
+          </div>
+      </section><!-- /Features 2 Section -->
+      
+    <!-- Call To Action Section -->
+    <section id="call-to-action" class="call-to-action section" data-aos="fade-up" data-aos-delay="100">
+        <div class="container">
+            <div class="row content justify-content-center align-items-center position-relative">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="display-4 mb-4">Start Your Journey Today</h2>
+                    <p class="mb-4">Join us and explore the endless possibilities in the world of cryptography and secure authentication.</p>
+                    <a href="#signup" class="btn btn-cta">Sign Up Now</a>
+                </div>
+                <!-- Abstract Background Elements -->
+                <div class="shape shape-1">
+                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M43.3,-57.1C57.4,-46.5,71.1,-32.6,75.3,-16.2C79.5,0.2,74.2,19.1,65.1,35.3C56,51.5,43.1,65,27.4,71.7C11.7,78.4,-6.8,78.3,-23.9,72.4C-41,66.5,-56.7,54.8,-65.4,39.2C-74.1,23.6,-75.8,4,-71.7,-13.2C-67.6,-30.4,-57.7,-45.2,-44.3,-56.1C-30.9,-67,-15.5,-74,0.7,-74.9C16.8,-75.8,33.7,-70.7,43.3,-57.1Z" transform="translate(100 100)"></path>
+                    </svg>
                 </div>
             </div>
         </div>
     </section>
+    
+    <section id="contact" class="contact section light-background">
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 True Image App. All rights reserved. | <a href="#">Privacy Policy</a></p>
+        <!-- Section Title -->
+        <div class="container section-title" data-aos="fade-up">
+          <h2>Contact Us</h2>
+          <p>We'd love to hear from you! If you have any questions, feel free to reach out using the form below or get in touch through the contact information provided.</p>
+        </div><!-- End Section Title -->
+      
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+      
+          <div class="row g-4 g-lg-5">
+            <div class="col-lg-5">
+              <div class="info-box" data-aos="fade-up" data-aos-delay="200">
+                <h3>Our Contact Info</h3>
+                <p>We are always ready to help! Whether you need support or want to discuss a project, feel free to reach out to us.</p>
+      
+                <div class="info-item" data-aos="fade-up" data-aos-delay="300">
+                  <div class="icon-box">
+                    <i class="bi bi-geo-alt"></i>
+                  </div>
+                  <div class="content">
+                    <h4>Our Location</h4>
+                    <p>1234 Business Ave, Suite 500</p>
+                    <p>Los Angeles, CA 90001</p>
+                  </div>
+                </div>
+      
+                <div class="info-item" data-aos="fade-up" data-aos-delay="400">
+                  <div class="icon-box">
+                    <i class="bi bi-telephone"></i>
+                  </div>
+                  <div class="content">
+                    <h4>Phone Number</h4>
+                    <p>+86 183 0224 7031</p>
+                    <p>+220 346 4754</p>
+                  </div>
+                </div>
+      
+                <div class="info-item" data-aos="fade-up" data-aos-delay="500">
+                  <div class="icon-box">
+                    <i class="bi bi-envelope"></i>
+                  </div>
+                  <div class="content">
+                    <h4>Email Address</h4>
+                    <p>support@trueimage.com</p>
+                    <p>info@trueimage.com</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+      
+            <div class="col-lg-7">
+              <div class="contact-form" data-aos="fade-up" data-aos-delay="300">
+                <h3>Get In Touch</h3>
+                <p>If you have any questions or need further assistance, fill out the form below, and we'll get back to you as soon as possible!</p>
+      
+                <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
+                  <div class="row gy-4">
+      
+                    <div class="col-md-6">
+                      <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
+                    </div>
+      
+                    <div class="col-md-6 ">
+                      <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
+                    </div>
+      
+                    <div class="col-12">
+                      <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
+                    </div>
+      
+                    <div class="col-12">
+                      <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
+                    </div>
+      
+                    <div class="col-12 text-center">
+                      <div class="loading">Loading</div>
+                      <div class="error-message"></div>
+                      <div class="sent-message">Your message has been sent. Thank you for reaching out!</div>
+      
+                      <button type="submit" class="btn">Send Message</button>
+                    </div>
+      
+                  </div>
+                </form>
+      
+              </div>
+            </div>
+      
+          </div>
+      
         </div>
-    </footer>
+      
+      </section><!-- /Contact Section -->
+      
+  </main>
 
-    <!-- Bootstrap and AOS JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({
-            duration: 1200,
-        });
-    </script>
+  <footer id="footer" class="footer">
+
+    <div class="container footer-top">
+      <div class="row gy-4">
+        <div class="col-lg-4 col-md-6 footer-about">
+          <a href="index.html" class="logo d-flex align-items-center">
+            <span class="sitename">TrueImage</span>
+          </a>
+          <div class="footer-contact pt-3">
+            <p>No 38 Tongyan Road, Jinnan Campus Nankai University</p>
+            <p>Tianjin City, 300000</p>
+            <p class="mt-3"><strong>Phone:</strong> <span>+86 183 0224 7031</span></p>
+            <p><strong>Email:</strong> <span>contact@trueimage.com</span></p>
+          </div>
+          <div class="social-links d-flex mt-4">
+            <a href="https://twitter.com/yourhandle"><i class="bi bi-twitter"></i></a>
+            <a href="https://facebook.com/yourpage"><i class="bi bi-facebook"></i></a>
+            <a href="https://instagram.com/yourprofile"><i class="bi bi-instagram"></i></a>
+            <a href="https://linkedin.com/in/yourprofile"><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+  
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Useful Links</h4>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+  
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Our Services</h4>
+          <ul>
+            <li><a href="#">Web Design</a></li>
+            <li><a href="#">Web Development</a></li>
+            <li><a href="#">Marketing</a></li>
+            <li><a href="#">SEO Optimization</a></li>
+            <li><a href="#">Graphic Design</a></li>
+          </ul>
+        </div>
+  
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="#">Customer Service</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+  
+      </div>
+    </div>
+  
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1 sitename">True Image</strong> <span class="year">2025</span> All Rights Reserved</p>
+      <div class="credits">
+        Designed by <a href="#">Malik Kolawole Lanlokun</a>
+      </div>
+    </div>
+  
+  </footer>
+  
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/php-email-form/validate.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/glightbox/js/glightbox.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/purecounter/purecounter_vanilla.js') }}"></script>
+  
+
+  <!-- Main JS File -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
 </body>
+
 </html>
