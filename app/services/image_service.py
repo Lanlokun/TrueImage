@@ -19,7 +19,6 @@ def sign_image(user_id, image_path):
 
         # Compute the image hash
         image_hash = hashlib.sha256(image_data).digest()
-        logging.debug(f"Computed image hash: {image_hash.hex()}")
 
         # Retrieve the user's private key
         user = User.query.get(user_id)
@@ -41,7 +40,6 @@ def sign_image(user_id, image_path):
             ),
             hashes.SHA256()
         )
-        logging.debug(f"Generated signature: {base64.b64encode(signature).decode('utf-8')}")
 
         # Save the metadata to the database
         metadata = ImageMetadata(
@@ -62,7 +60,6 @@ def sign_image(user_id, image_path):
 
 def verify_image(user_id, image_path):
     try:
-        logging.debug(f"Verifying image for user_id={user_id}, filename={os.path.basename(image_path)}")
 
         # Read the image file
         with open(image_path, 'rb') as image_file:
@@ -70,7 +67,6 @@ def verify_image(user_id, image_path):
 
         # Compute the image hash
         image_hash = hashlib.sha256(image_data).digest()
-        logging.debug(f"Computed image hash: {image_hash.hex()}")
 
         # Load the metadata from the database
         metadata = ImageMetadata.query.filter_by(

@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="login-container">
-    <h2><i class="fas fa-sign-in-alt"></i> Login</h2> <!-- Add Login Icon -->
+    <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
 
     <!-- Flash messages -->
     <div class="flash-messages">
@@ -22,17 +22,22 @@
     <!-- Login form -->
     <form method="POST" action="{{ url_for('auth.login') }}">
         <div class="form-group">
-            <label for="phone"><i class="fas fa-phone"></i> Phone Number</label> <!-- Phone Icon -->
+            <label for="phone"><i class="fas fa-phone"></i> Phone Number</label>
             <input type="text" id="phone" name="phone" required>
         </div>
         <div class="form-group">
-            <label for="password"><i class="fas fa-lock"></i> Password</label> <!-- Lock Icon -->
+            <label for="password"><i class="fas fa-lock"></i> Password</label> 
             <input type="password" id="password" name="password" required>
         </div>
         <button type="submit" class="btn-login">
-            <i class="fas fa-sign-in-alt"></i> Login <!-- Login Icon -->
+            <i class="fas fa-sign-in-alt"></i> Login
         </button>
     </form>
+
+    <!-- Forgot Password Link -->
+    <div class="forgot-password-link">
+        <a href="#"><i class="fas fa-unlock-alt"></i> Forgot Password?</a> 
+    </div>
 
     <!-- Register link -->
     <div class="register-link">

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Image Gallery{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Image Gallery</h1>
+
+    <!-- Flash messages if any -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="mt-3">
+                {% for category, message in messages %}
+                    <div class="alert 
+                        {% if category == 'success' %}
+                            alert-success
+                        {% elif category == 'danger' %}
+                            alert-danger
+                        {% elif category == 'warning' %}
+                            alert-warning
+                        {% endif %}
+                    ">
+                        <p class="mb-0">{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Back Button -->
+    <div class="mb-4">
+        <a href="{{ url_for('images.upload_image') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Upload
+        </a>
+    </div>
+
+    {% if images %}
+        <!-- Image Gallery Grid -->
+        <div class="row">
+            {% for image in images %}
+                <div class="col-md-3 mb-4">
+                    <div class="card">
+                        <img src="{{ image }}" class="card-img-top" alt="Image">
+                        <div class="card-body">
+                            <a href="{{ image }}" class="btn btn-primary w-100">View</a>
+                            <button class="btn btn-danger w-100 mt-2" onclick="deleteImage('{{ image }}')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info mt-4">
+            <p>No images available to display. Please upload an image.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function deleteImage(imagePath) {
+        if(confirm('Are you sure you want to delete this image?')) {
+            window.location.href = '/delete_image?image=' + imagePath;
+        }
+    }
+</script>
+
+{% endblock %}
