@@ -32,4 +32,4 @@ class ImageMetadata(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     filename = db.Column(db.String(255), nullable=False)
     image_hash = db.Column(db.String(64), nullable=False)
-    signature = db.Column(db.LargeBinary, nullable=False)
+    signature = db.Column(db.Text, nullable=False)  # ✅ Store base64-encoded string

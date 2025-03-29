@@ -1,117 +1,176 @@
-from flask import Blueprint, render_template, request, redirect, url_for, send_from_directory, flash, current_app
+from flask import Blueprint, request, jsonify, send_from_directory, current_app, url_for
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 import os
-from app.services.image_service import sign_image, verify_image
-from app.config import Config
+import jwt
+from functools import wraps
+from app.models import User  # Assuming you have these models
+
 import logging
 
+from app.services.image_service import sign_image, verify_image
+
 images_bp = Blueprint('images', __name__)
-from flask import current_app, request, flash, redirect, render_template, url_for
-from flask_login import login_required, current_user
-from werkzeug.utils import secure_filename
-import os
 
-@images_bp.route('/upload_image', methods=['GET', 'POST'])
-@login_required
+
+secret_key = os.getenv("SECRET_KEY")
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def jwt_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+
+        if not token:
+            return jsonify({"error": "Token is missing!"}), 401
+
+        try:
+            token = token.split("Bearer ")[-1]  # Extract JWT from "Bearer <token>"
+            decoded_token = jwt.decode(token, secret_key, algorithms=["HS256"])
+            user_id = decoded_token.get('user_id')
+
+            # Fetch the user from the database
+            user = User.query.get(user_id)
+            if not user:
+                return jsonify({"error": "User not found!"}), 401
+
+            # Set current_user manually
+            setattr(current_app, 'current_user', user)
+
+        except jwt.ExpiredSignatureError:
+            return jsonify({"error": "Token expired!"}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({"error": "Invalid token!"}), 401
+
+        return f(*args, **kwargs)
+
+    return decorated
+
+
+
+@images_bp.route('/upload', methods=['POST'])
+@jwt_required  # Use the JWT authentication decorator
 def upload_image():
-    verification_result = None
-    uploaded_image = None
+    user = getattr(current_app, 'current_user', None)
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
 
-    if request.method == 'POST' and 'image' in request.files:
-        file = request.files['image']
-        if file.filename == '':
-            flash('No file selected.', 'warning')
-            return redirect(request.url)
+    # Check if the file part exists in the request
+    if 'image' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+    
+    file = request.files['image']
+    
+    # Check if the file has no filename
+    if file.filename == '':
+        return jsonify({"error": "No file selected"}), 400
 
-        # Secure and create the filename
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+    # Validate the file extension
+    if not allowed_file(file.filename):
+        return jsonify({"error": "Invalid file type. Only PNG, JPG, JPEG, and GIF are allowed."}), 400
 
-        # Check if the file already exists
-        if os.path.exists(filepath):
-            flash('Image with this filename already exists. Please upload a different image.', 'danger')
-            return redirect(request.url)
+    filename = secure_filename(file.filename)
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    filepath = os.path.join(upload_folder, filename)
 
-        # Save and sign the image
+    # Check if the file already exists
+    if os.path.exists(filepath):
+        return jsonify({"error": "An image with this name already exists. Please rename your file."}), 409
+
+    try:
+        # Save the file
         file.save(filepath)
 
-        # Sign the image (assumes sign_image is defined elsewhere)
-        signature, image_hash = sign_image(current_user.id, filepath)
-        if signature is None:
-            flash('Error signing image.', 'danger')
-            return redirect(request.url)
+        # Sign the image and get the metadata (adjust to handle return values properly)
+        success = sign_image(user.id, filepath)  # Assume sign_image returns a boolean
 
-        flash('Image signed successfully.', 'success')
+        if not success:  # If signing failed, handle gracefully
+            return jsonify({"error": "Error signing image"}), 500
 
-        # After saving the file, pass the uploaded image URL for preview
-        uploaded_image = url_for('images.uploaded_file', filename=filename)  # Adjusted to use the new route
-        print(uploaded_image)
+        # Return success message with file URL
+        return jsonify({
+            "message": "Image uploaded successfully",
+            "filename": filename,
+            "url": url_for('images.get_image', filename=filename, _external=True)
+        })
 
-        return render_template('upload_image.html', verification_result=verification_result, uploaded_image=uploaded_image)
-
-    return render_template('upload_image.html', verification_result=verification_result, uploaded_image=uploaded_image)
-
-
-@images_bp.route('/verify_image', methods=['POST'])
-@login_required
+    except Exception as e:
+        # Log any errors
+        logging.error(f"Error saving file: {str(e)}")
+        return jsonify({"error": "An error occurred while uploading the image"}), 500
+@images_bp.route('/verify', methods=['POST'])
+@jwt_required
 def verify_image_route():
-    verification_result = None
+    user = getattr(current_app, 'current_user', None)
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
 
-    if 'verify_image' in request.files:
-        verify_file = request.files['verify_image']
-        if verify_file.filename == '':
-            flash('No file selected for verification.', 'warning')
-            return redirect(url_for('images.upload_image'))
+    # ✅ Ensure 'image' is the correct key
+    if 'image' not in request.files:
+        return jsonify({"error": "No file provided"}), 400
 
-        # Save and verify the image
+    verify_file = request.files['image']
+
+    if verify_file.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+
+    if not allowed_file(verify_file.filename):
+        return jsonify({"error": "Invalid file type"}), 400
+
+    try:
         verify_filename = secure_filename(verify_file.filename)
         verify_filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], verify_filename)
         verify_file.save(verify_filepath)
 
-        # Call the verify_image function and store the result
-        verification_result = verify_image(current_user.id, verify_filepath)
+        verification_result = verify_image(user.id, verify_filepath)
+        os.remove(verify_filepath)
 
-        if verification_result is None:
-            flash('Error verifying image.', 'danger')
-        elif verification_result:
-            flash('✅ Image verified successfully.', 'success')
-        else:
-            flash('❌ Invalid image signature.', 'danger')
+        return jsonify({"verified": verification_result})
 
-    return redirect(url_for('images.upload_image', verification_result=verification_result))
+    except Exception as e:
+        logging.error(f"Error verifying image: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
 
-
-
-@images_bp.route('/uploads/<filename>')
-def uploaded_file(filename):
+@images_bp.route('/images/<filename>', methods=['GET'])
+def get_image(filename):
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
 
-
-@images_bp.route('/gallery')
-@login_required
+@images_bp.route('/gallery', methods=['GET'])
+@jwt_required
 def gallery():
     images = []
     upload_folder = current_app.config['UPLOAD_FOLDER']
-    
-    for filename in os.listdir(upload_folder):
-        if filename.endswith(('.png', '.jpg', '.jpeg', '.gif')):  # Filter image file extensions
-            images.append(url_for('images.uploaded_file', filename=filename))  # Add the URL to the image
-    
-    return render_template('image_gallery.html', images=images)
 
+    try:
+        for filename in os.listdir(upload_folder):
+            if allowed_file(filename):
+                images.append(url_for('images.get_image', filename=filename, _external=True))
+        return jsonify({"images": images})
+    except Exception as e:
+        logging.error(f"Error loading gallery: {str(e)}")
+        return jsonify({"error": "An error occurred while loading the gallery"}), 500
 
-@images_bp.route('/delete_image', methods=['GET'])
+@images_bp.route('/delete', methods=['DELETE'])
 @login_required
 def delete_image():
-    image_path = request.args.get('image')
-    filename = os.path.basename(image_path)
-    image_full_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-    
-    try:
-        os.remove(image_full_path)  # Delete the image file
-        flash('Image deleted successfully!', 'success')
-    except FileNotFoundError:
-        flash('Image not found.', 'danger')
+    data = request.get_json()
+    image_filename = data.get('image')
 
-    return redirect(url_for('images.gallery'))
+    if not image_filename:
+        return jsonify({"error": "No image specified for deletion"}), 400
+
+    image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], secure_filename(image_filename))
+
+    try:
+        if os.path.exists(image_path):
+            os.remove(image_path)
+            return jsonify({"message": "Image deleted successfully"})
+        else:
+            return jsonify({"error": "Image not found"}), 404
+    except Exception as e:
+        logging.error(f"Error deleting image: {str(e)}")
+        return jsonify({"error": "An error occurred while deleting the image"}), 500

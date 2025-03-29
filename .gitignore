@@ -1,2 +1,12 @@
 venv/
+app/.env
+app/.env.local
+app/.env.*.local
+.env.local
+.env.*.local
 .env
+.env.*
+uploads/
+migrations/__pycache__/
+__pycache__/
+*.py[cod]

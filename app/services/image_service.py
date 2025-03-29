@@ -1,37 +1,36 @@
 import os
 import hashlib
 import logging
+import base64
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import serialization, hashes
-from app.models import ImageMetadata
+from app.models import ImageMetadata, User
 from app.extensions import db
-from app.models import User
-from datetime import datetime
-import base64
 
 logging.basicConfig(level=logging.DEBUG)
 
 def sign_image(user_id, image_path):
     try:
-        # Read the image file
-        with open(image_path, 'rb') as image_file:
-            image_data = image_file.read()
+        # Load image
+        with open(image_path, 'rb') as f:
+            image_data = f.read()
 
-        # Compute the image hash
+        # Hash the image with SHA-256 (as bytes)
         image_hash = hashlib.sha256(image_data).digest()
 
-        # Retrieve the user's private key
+        # Load user
         user = User.query.get(user_id)
         if not user:
-            logging.error(f"User not found for user_id={user_id}")
-            return None, None
+            logging.error("User not found")
+            return False
 
+        # Load private key
         private_key = serialization.load_pem_private_key(
             user.private_key,
-            password=None
+            password=None,
         )
 
-        # Sign the image hash
+        # Sign the hash
         signature = private_key.sign(
             image_hash,
             padding.PSS(
@@ -41,57 +40,59 @@ def sign_image(user_id, image_path):
             hashes.SHA256()
         )
 
-        # Save the metadata to the database
+        # Encode signature in base64
+        signature_b64 = base64.b64encode(signature).decode('utf-8')
+
+        # Store metadata
         metadata = ImageMetadata(
-            user_id=user_id,
+            user_id=user.id,
             filename=os.path.basename(image_path),
-            image_hash=image_hash.hex(),  # Store the image hash as a hex string
-            signature=signature,
+            image_hash=hashlib.sha256(image_data).hexdigest(),  # Store as string
+            signature=signature_b64  # Store as base64 string
         )
         db.session.add(metadata)
         db.session.commit()
-        logging.debug(f"Metadata saved for user_id={user_id}, filename={os.path.basename(image_path)}")
 
-        return signature, image_hash
+        logging.info("Image signed and metadata saved.")
+        return True
 
     except Exception as e:
         logging.error(f"Error signing image: {e}")
-        return None, None
+        return False
+
 
 def verify_image(user_id, image_path):
     try:
+        # Load image
+        with open(image_path, 'rb') as f:
+            image_data = f.read()
 
-        # Read the image file
-        with open(image_path, 'rb') as image_file:
-            image_data = image_file.read()
-
-        # Compute the image hash
+        # Recompute hash
         image_hash = hashlib.sha256(image_data).digest()
 
-        # Load the metadata from the database
+        # Get metadata
         metadata = ImageMetadata.query.filter_by(
             user_id=user_id,
             filename=os.path.basename(image_path)
         ).first()
-
         if not metadata:
-            logging.error(f"No metadata found for user_id={user_id}, filename={os.path.basename(image_path)}")
-            return False  # Return False when metadata is not found
+            logging.error("No metadata found")
+            return False
 
-        # Retrieve the user from the database
+        # Get user and public key
         user = User.query.get(user_id)
         if not user:
-            logging.error(f"User not found for user_id={user_id}")
-            return False  # Return False when user is not found
+            logging.error("User not found")
+            return False
 
-        # Load the public key from the database
-        public_key = serialization.load_pem_public_key(
-            user.public_key  # Public key stored in the User table
-        )
+        public_key = serialization.load_pem_public_key(user.public_key)
 
-        # Verify the signature
+        # Decode the base64 signature
+        signature_bytes = base64.b64decode(metadata.signature)
+
+        # Verify signature
         public_key.verify(
-            metadata.signature,
+            signature_bytes,
             image_hash,
             padding.PSS(
                 mgf=padding.MGF1(hashes.SHA256()),
@@ -99,9 +100,10 @@ def verify_image(user_id, image_path):
             ),
             hashes.SHA256()
         )
-        logging.debug("Signature is valid. Image is authentic.")
-        return True  # Return True when the signature is valid
+
+        logging.info("Signature is valid.")
+        return True
 
     except Exception as e:
         logging.error(f"Error verifying image: {e}")
-        return False  # Return False when an error occurs
+        return False
