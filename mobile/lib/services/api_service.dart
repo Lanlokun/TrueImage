@@ -112,17 +112,21 @@ class ApiService {
 
       var response = await request.send();
 
+      // If statusCode is 200, return the response body
       if (response.statusCode == 200) {
         return jsonDecode(await response.stream.bytesToString());
       } else {
-        debugPrint(
-          "Error verifying image: Server responded with status code ${response.statusCode}",
-        );
-        return {'error': 'Verification failed: ${response.statusCode}'};
+        // If the status code is 400 or any error, handle the error
+        String errorMessage = await response.stream.bytesToString();
+        debugPrint("Error verifying image: $errorMessage");
+        return {
+          'verified': false, // Ensure the 'verified' field is always returned
+          'error': 'Verification failed: ${response.statusCode}. $errorMessage',
+        };
       }
     } catch (e) {
       debugPrint("Error verifying image: $e");
-      return {'error': 'Network error: $e'};
+      return {'verified': false, 'error': 'Network error: $e'};
     }
   }
 
@@ -136,7 +140,21 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return List<String>.from(data['images']);
+
+        // Check if the 'images' key exists and is a list
+        if (data['images'] is List) {
+          // Extract URLs from each image object in the 'images' list
+          List<String> imageUrls = [];
+          for (var image in data['images']) {
+            if (image['url'] != null) {
+              imageUrls.add(image['url']);
+            }
+          }
+          return imageUrls;
+        } else {
+          debugPrint("Error: 'images' key is not a list.");
+          return null;
+        }
       } else {
         debugPrint('Error fetching gallery: ${response.body}');
         return null;

@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 
 class GalleryScreen extends StatefulWidget {
+  const GalleryScreen({super.key});
+
   @override
   _GalleryScreenState createState() => _GalleryScreenState();
 }

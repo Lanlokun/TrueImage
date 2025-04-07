@@ -27,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false, // Prevents UI shift due to keyboard
       appBar: AppBar(
         title: Text(
           "True Image App",
@@ -37,31 +38,30 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.logout, color: Colors.white),
-            onPressed:
-                () => Navigator.pushNamed(
-                  context,
-                  '/login',
-                ), // Navigate to login screen
+            onPressed: () => Navigator.pushNamed(context, '/login'),
           ),
         ],
       ),
-      body: _screens[_selectedIndex], // Display selected screen
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Colors.deepPurpleAccent,
-        unselectedItemColor: Colors.grey,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.camera_alt),
-            label: 'Camera',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.photo_library),
-            label: 'Gallery',
-          ),
-        ],
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: SafeArea(
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed, // Prevents shifting
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          selectedItemColor: Colors.deepPurpleAccent,
+          unselectedItemColor: Colors.grey,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.camera_alt),
+              label: 'Camera',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.photo_library),
+              label: 'Gallery',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -71,69 +71,55 @@ class _HomeScreenState extends State<HomeScreen> {
 class HomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white, // Set the background color to white
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Logo at the top
-              Image.asset(
-                'assets/images/logo.png', // Replace with the path to your logo
-                width: 120,
-                height: 120,
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/images/logo.png',
+                    width: 120,
+                    height: 120,
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    "Welcome to True Image App!",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "Capture, upload, and verify images with ease. Join the True Image community today!",
+                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 40),
+                  _buildSimpleButton(
+                    context,
+                    label: "Upload & Sign Image",
+                    icon: Icons.upload_file,
+                    route: '/upload',
+                  ),
+                  _buildSimpleButton(
+                    context,
+                    label: "Verify Image",
+                    icon: Icons.check_circle,
+                    route: '/verify',
+                  ),
+                ],
               ),
-              SizedBox(height: 20),
-
-              // App heading
-              Text(
-                "Welcome to True Image App!",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black, // Keep text dark for readability
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 10),
-
-              // Promo excerpt
-              Text(
-                "Capture, upload, and verify images with ease. Join the True Image community today!",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black54, // Lighter color for promo text
-                  fontWeight: FontWeight.w400,
-                  fontStyle: FontStyle.italic,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 40),
-
-              // Simple ElevatedButtons without shadow and border
-              _buildSimpleButton(
-                context,
-                label: "Upload & Sign Image",
-                icon: Icons.upload_file,
-                route: '/upload',
-              ),
-              _buildSimpleButton(
-                context,
-                label: "Verify Image",
-                icon: Icons.check_circle,
-                route: '/verify',
-              ),
-            ],
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 
-  // Reusable button widget without border or shadow
   Widget _buildSimpleButton(
     BuildContext context, {
     required String label,
@@ -144,16 +130,12 @@ class HomeContent extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: ElevatedButton.icon(
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all(
-            Colors.blueAccent,
-          ), // Button color
+          backgroundColor: MaterialStateProperty.all(Colors.blueAccent),
           padding: MaterialStateProperty.all(
             EdgeInsets.symmetric(vertical: 14, horizontal: 20),
           ),
           shape: MaterialStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12), // Rounded corners
-            ),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
         icon: Icon(icon, size: 24, color: Colors.white),
