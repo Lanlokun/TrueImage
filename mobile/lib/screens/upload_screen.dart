@@ -5,6 +5,8 @@ import '../services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UploadScreen extends StatefulWidget {
+  const UploadScreen({super.key});
+
   @override
   _UploadScreenState createState() => _UploadScreenState();
 }
@@ -37,7 +39,6 @@ class _UploadScreenState extends State<UploadScreen> {
     await prefs.remove('jwt_token');
   }
 
-  // Upload the image to the server
   void uploadImage() async {
     if (_image == null) {
       ScaffoldMessenger.of(
@@ -46,10 +47,8 @@ class _UploadScreenState extends State<UploadScreen> {
       return;
     }
 
-    // Check if the user is authenticated
     String? token = await getAuthToken();
     if (token == null) {
-      // If no token, show an error and navigate to login
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("You must log in first")));
@@ -61,32 +60,46 @@ class _UploadScreenState extends State<UploadScreen> {
       _isUploading = true;
     });
 
-    var response = await ApiService.uploadImage(
-      _image!,
-      token,
-    ); // Send token with the image upload request
+    var response = await ApiService.uploadImage(_image!, token);
+
     setState(() {
       _isUploading = false;
     });
 
     if (response != null) {
       if (response.containsKey('error')) {
-        // If the server response contains an error (e.g., invalid token), handle it
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Upload failed: ${response['error']}")),
-        );
-        // Clear the token and navigate to login if needed
-        await clearAuthToken();
-        Navigator.pushReplacementNamed(context, '/login');
+        final errorMsg = response['error'];
+        final statusCode =
+            response['statusCode']; // Assume your ApiService returns this
+
+        String userFriendlyMsg;
+
+        if (statusCode == 409) {
+          userFriendlyMsg =
+              "This image or a similar one already exists on the server.";
+        } else if (errorMsg.toString().toLowerCase().contains('unauthorized') ||
+            errorMsg.toString().toLowerCase().contains('token expired') ||
+            errorMsg.toString().toLowerCase().contains('invalid token')) {
+          userFriendlyMsg = "Session expired. Please log in again.";
+          await clearAuthToken();
+          Navigator.pushReplacementNamed(context, '/login');
+          return;
+        } else {
+          userFriendlyMsg = "Upload failed: $errorMsg";
+        }
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(userFriendlyMsg)));
       } else {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text("Image uploaded successfully")));
       }
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Upload failed")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Upload failed: No response from server")),
+      );
     }
   }
 

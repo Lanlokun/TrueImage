@@ -5,7 +5,7 @@ import os
 import jwt
 from functools import wraps
 from app.models import User, ImageMetadata
-
+import hashlib
 import logging
 
 from app.services.image_service import sign_image, verify_image
@@ -77,10 +77,12 @@ def upload_image():
     upload_folder = current_app.config['UPLOAD_FOLDER']
     filepath = os.path.join(upload_folder, filename)
 
-    # Check if the file already exists
-    if os.path.exists(filepath):
-        return jsonify({"error": "An image with this name already exists. Please rename your file."}), 409
+    image_hash = hashlib.sha256(file.read()).hexdigest()
+    existing_image_metadata = ImageMetadata.query.filter_by(image_hash=image_hash).first()
+    if existing_image_metadata:
+        return jsonify({"error": "This image has already been signed."}), 409
 
+    file.seek(0)
 
     try:
         # Save the file

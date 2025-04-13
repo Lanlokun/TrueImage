@@ -5,7 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = "http://10.0.2.2:5000/";
+  static const String baseUrl = "https://trueimage.onrender.com/";
+  // static const String baseUrl = "http://10.0.2.2:5000/";
 
   // Login User
   static Future<Map<String, dynamic>?> loginUser(
@@ -80,19 +81,26 @@ class ApiService {
       request.headers['Authorization'] = 'Bearer $token';
 
       var response = await request.send();
+      final responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
-        // If the response is successful, decode the JSON
-        return jsonDecode(await response.stream.bytesToString());
+        // If the response is successful, decode and return the JSON
+        return jsonDecode(responseBody);
       } else {
         debugPrint(
           "Error: Server responded with status code ${response.statusCode}",
         );
-        return {'error': 'Server error: ${response.statusCode}'};
+        return {
+          'error': jsonDecode(responseBody)['error'] ?? 'Server error',
+          'statusCode': response.statusCode,
+        };
       }
     } catch (e) {
       debugPrint("Error uploading image: $e");
-      return {'error': 'Network error: $e'};
+      return {
+        'error': 'Network error: $e',
+        'statusCode': 0, // 0 to indicate a client-side error
+      };
     }
   }
 
