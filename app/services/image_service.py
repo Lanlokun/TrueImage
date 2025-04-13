@@ -75,9 +75,6 @@ def verify_image(user_id, image_path):
             user_id=user_id,
             filename=os.path.basename(image_path)
         ).first()
-        if not metadata:
-            logging.error("No metadata found")
-            return False
 
         # Get user and public key
         user = User.query.get(user_id)

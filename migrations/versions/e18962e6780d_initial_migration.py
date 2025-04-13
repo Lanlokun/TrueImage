@@ -1,8 +1,8 @@
-"""Add national_id to user model
+"""Initial migration
 
-Revision ID: 989e2be1a6be
+Revision ID: e18962e6780d
 Revises: 
-Create Date: 2025-03-14 20:08:26.635786
+Create Date: 2025-04-07 09:03:40.081931
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '989e2be1a6be'
+revision = 'e18962e6780d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,7 +34,8 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('filename', sa.String(length=255), nullable=False),
     sa.Column('image_hash', sa.String(length=64), nullable=False),
-    sa.Column('signature', sa.LargeBinary(), nullable=False),
+    sa.Column('signature', sa.Text(), nullable=False),
+    sa.Column('uploaded_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

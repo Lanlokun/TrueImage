@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 import os
 import jwt
 from functools import wraps
-from app.models import User  # Assuming you have these models
+from app.models import User, ImageMetadata
 
 import logging
 
@@ -81,6 +81,7 @@ def upload_image():
     if os.path.exists(filepath):
         return jsonify({"error": "An image with this name already exists. Please rename your file."}), 409
 
+
     try:
         # Save the file
         file.save(filepath)
@@ -102,6 +103,8 @@ def upload_image():
         # Log any errors
         logging.error(f"Error saving file: {str(e)}")
         return jsonify({"error": "An error occurred while uploading the image"}), 500
+
+
 @images_bp.route('/verify', methods=['POST'])
 @jwt_required
 def verify_image_route():
@@ -109,7 +112,7 @@ def verify_image_route():
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
 
-    # ✅ Ensure 'image' is the correct key
+    # Ensure 'image' is the correct key
     if 'image' not in request.files:
         return jsonify({"error": "No file provided"}), 400
 
@@ -127,35 +130,69 @@ def verify_image_route():
         verify_file.save(verify_filepath)
 
         verification_result = verify_image(user.id, verify_filepath)
-        os.remove(verify_filepath)
 
-        return jsonify({"verified": verification_result})
+        # Fetch Image Metadata
+        metadata = ImageMetadata.query.filter_by(user_id=user.id, filename=verify_filename).first()
+
+        # Handle image tampering or verification failure
+        if verification_result is False:
+            return jsonify({
+                "verified": False,
+                "error": "Image tampered or verification failed.",
+                "details": "The image might have been altered or doesn't match expected patterns."
+            }), 400
+
+        # If image is successfully verified
+        uploader_info = {
+            "phone_number": user.phone_number,
+            "verified": verification_result
+        }
+
+        image_metadata = {
+            "filename": metadata.filename,
+            "uploaded_at": metadata.uploaded_at.strftime('%Y-%m-%d %H:%M:%S')
+        }
+
+        return jsonify({
+            "verified": verification_result,
+            "uploader": uploader_info,
+            "image_metadata": image_metadata
+        })
 
     except Exception as e:
         logging.error(f"Error verifying image: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
+
 @images_bp.route('/images/<filename>', methods=['GET'])
 def get_image(filename):
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
 
+
 @images_bp.route('/gallery', methods=['GET'])
 @jwt_required
 def gallery():
-    images = []
-    upload_folder = current_app.config['UPLOAD_FOLDER']
-
     try:
-        for filename in os.listdir(upload_folder):
-            if allowed_file(filename):
-                images.append(url_for('images.get_image', filename=filename, _external=True))
+        image_records = ImageMetadata.query.all()
+        images = []
+
+        for image in image_records:
+            images.append({
+                "filename": image.filename,
+                "url": url_for('images.get_image', filename=image.filename, _external=True),
+                "uploaded_at": image.uploaded_at.isoformat(),
+                "uploader_id": image.user_id,
+                "uploader_phone": image.user.phone_number,  # Assuming phone number is safe to show
+            })
+
         return jsonify({"images": images})
+
     except Exception as e:
         logging.error(f"Error loading gallery: {str(e)}")
         return jsonify({"error": "An error occurred while loading the gallery"}), 500
 
 @images_bp.route('/delete', methods=['DELETE'])
-@login_required
+@jwt_required
 def delete_image():
     data = request.get_json()
     image_filename = data.get('image')

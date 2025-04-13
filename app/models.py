@@ -1,5 +1,7 @@
 from app.extensions import db
 from flask_login import UserMixin
+from datetime import datetime
+
 
 class User(db.Model, UserMixin):
     __tablename__ = "user"
@@ -9,6 +11,7 @@ class User(db.Model, UserMixin):
     national_id = db.Column(db.String(20), unique=True, nullable=False)
     private_key = db.Column(db.LargeBinary, nullable=False)
     public_key = db.Column(db.LargeBinary, nullable=False)
+
 
     @property
     def is_active(self):
@@ -33,3 +36,6 @@ class ImageMetadata(db.Model):
     filename = db.Column(db.String(255), nullable=False)
     image_hash = db.Column(db.String(64), nullable=False)
     signature = db.Column(db.Text, nullable=False)  # ✅ Store base64-encoded string
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='images')
